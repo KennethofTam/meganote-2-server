@@ -33,6 +33,37 @@ router.post('/', function(req, res) {
     );
 });
 
+// UPDATE a user
+router.put('/:id', (req, res) => {
+  User
+    .findOne({
+      _id: req.params.id
+    })
+    .then(
+      user => {
+        if (user) {
+          // res.json('Yay');
+          user.name = req.body.user.name;
+          user.username = req.body.user.username;
+          user
+            .save()
+            .then(
+              // Success
+              () => res.json({ user }) ,
+
+              //Failure
+              () => {
+                res.status(422).json ({ message: 'Unable to update user' });
+              }
+            );
+          }
+        else {
+            res.status(404).json({ message: 'Could not find that user' });
+        }
+      }
+    )
+});
+
 module.exports = router;
 
 function passwordsPresent(payload) {
