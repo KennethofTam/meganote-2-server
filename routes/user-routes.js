@@ -22,9 +22,13 @@ router.post('/', function(req, res) {
     .save()
     .then(
       userData => {
-        var token = jwt.sign(userData._id, process.env.JWT_SECRET, {
-          expiresIn: 60*60*24
-        });
+        var token = jwt.sign(
+          { _id: userData._id },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: 60*60*24
+          }
+        );
         res.json({
           user: userData,
           authToken: token
@@ -33,7 +37,7 @@ router.post('/', function(req, res) {
     );
 });
 
-// UPDATE a user
+// UPDATE user
 router.put('/:id', (req, res) => {
   User
     .findOne({
@@ -42,26 +46,25 @@ router.put('/:id', (req, res) => {
     .then(
       user => {
         if (user) {
-          // res.json('Yay');
+          // user exists
           user.name = req.body.user.name;
           user.username = req.body.user.username;
           user
             .save()
             .then(
-              // Success
-              () => res.json({ user }) ,
+              // success
+              () => res.json({ user }),
 
-              //Failure
-              () => {
-                res.status(422).json ({ message: 'Unable to update user' });
-              }
+              // failure
+              () => res.status(422).json({ message: 'Unable to update user.' })
             );
-          }
+        }
         else {
-            res.status(404).json({ message: 'Could not find that user' });
+          // user does not exist
+          res.status(404).json({ message: 'Could not find that user.' });
         }
       }
-    )
+    );
 });
 
 module.exports = router;

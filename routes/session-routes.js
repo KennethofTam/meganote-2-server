@@ -1,5 +1,4 @@
 var router = require('express').Router();
-var bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken');
 var User = require('../models/user');
 
@@ -9,36 +8,37 @@ router.post('/', (req, res) => {
     .findOne({
       username: req.body.user.username
     })
-    .then (
+    .then(
       user => {
         if (user) {
-          // User exists, check if password matches
+          // user exists
           user.authenticate(req.body.user.password, (isMatch) => {
             if (isMatch) {
-              // Correct password
-              var token = jwt.sign(userData._id, process.env.JWT_SECRET, {
-                expiresIn: 60*60*24
-              });
+              // correct password
+              var token = jwt.sign(
+                { _id: user._id },
+                process.env.JWT_SECRET,
+                {
+                  expiresIn: 60*60*24
+                }
+              );
               res.json({
                 user,
                 authToken: token
               });
             }
             else {
-              // Wrong password
-              res.status(401).json({
-                message: 'We are unable to log you in with those credentials'});
+              // wrong password
+              res.status(401).json({ message: 'We were unable to log you in with those credentials.' });
             }
           });
-
         }
         else {
-          // User does not exist
-          res.status(401).json({
-            message: 'We are unable to log you in with those credentials'});
+          // user does not exist
+          res.status(401).json({ message: 'We were unable to log you in with those credentials.' });
         }
       }
-    )
+    );
 });
 
 module.exports = router;

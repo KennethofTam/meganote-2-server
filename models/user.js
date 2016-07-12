@@ -1,5 +1,5 @@
 var db = require('../config/db');
-var bcrypt = require('bcrypt.js');
+var bcrypt = require('bcryptjs');
 
 var userSchema = db.Schema({
   name: {
@@ -33,11 +33,12 @@ userSchema.methods.toJSON = function() {
   return user;
 };
 
-userSchema.methods.authenticate = function (password, callback) {
+userSchema.methods.authenticate = function(password, callback) {
   // Callback gets error and whether or not passwords matched
   bcrypt.compare(password, this.passwordDigest, (err, isMatch) => {
-      callback(isMatch);
-  });
+  // Change callback to a promise if you can
+  callback(isMatch);
+});
 };
 
 var User = db.model('User', userSchema);
